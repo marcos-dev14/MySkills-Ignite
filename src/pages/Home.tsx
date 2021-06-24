@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { 
   View, 
@@ -12,18 +12,52 @@ import {
 import { Button } from '../components/Button';
 import { SkillCard } from '../components/SkillCard';
 
+interface SkillData {
+  id: string;
+  name: string;
+}
+
 export function Home() {
   const [newSkill, setNewSkill] = useState('');
-  const [mySkills, setMySkills] = useState([]);
+  const [mySkills, setMySkills] = useState<SkillData[]>([]);
+  const [greeting, setGreeting] = useState('');
+
+  const data = {
+    id: String(new Date().getTime()),
+    name: newSkill
+  }
 
   // Criando uma função para adicionar novas Skills
   function handleAddNewSkill() {
-    setMySkills(oldState => [...oldState, newSkill]);
+    setMySkills(oldState => [...oldState, data]);
   }
+
+  function handleRemoveSkill(id: string) {
+    setMySkills(oldState => oldState.filter(
+      skill => skill.id !== id
+    ))
+  }
+
+  useEffect(() => {
+    const currentHour = new Date().getHours(); // variável para guardar o horário atual
+
+    // Condição if e else para mostrar a frase dependendo da hora
+    if(currentHour < 12) {
+      setGreeting('Good Morning');
+    } else if(currentHour >= 12 && currentHour < 18) {
+      setGreeting('Good Afternoon');
+    }else{
+      setGreeting('Good Night');
+    }
+  }, []);
 
   return (
     <View style={styles.container}>
+
       <Text style={styles.title}>Welcome, Marcos Paulo</Text>
+      <Text style={styles.greetingText}>
+        {greeting}
+      </Text>
 
       <TextInput 
         style={styles.input}
@@ -32,7 +66,10 @@ export function Home() {
         onChangeText={setNewSkill}
       />
 
-      <Button onPress={handleAddNewSkill} />
+      <Button 
+        onPress={handleAddNewSkill}
+        title="Add Skill" 
+      />
 
       <Text style={[styles.title, { marginVertical: 50 }]}>
         New Skills
@@ -40,9 +77,12 @@ export function Home() {
 
       <FlatList 
         data={mySkills}
-        keyExtractor={item => item}
+        keyExtractor={item => item.id}
         renderItem={({ item }) => (
-          <SkillCard skill={item} />
+          <SkillCard 
+            skill={item.name} 
+            onPress={() => handleRemoveSkill(item.id)}
+          />
         )}
       />
     </View>
@@ -71,5 +111,10 @@ const styles = StyleSheet.create({
     marginTop: 30,
     borderRadius: 10,
   },
+  greetingText: {
+    color: '#FFF',
+    fontSize: 18,
+
+  }
   
 })
