@@ -32,10 +32,11 @@ export function Home() {
     setMySkills(oldState => [...oldState, data]);
   }
 
+  // Criando uma funcção para remover as Skills
   function handleRemoveSkill(id: string) {
     setMySkills(oldState => oldState.filter(
       skill => skill.id !== id
-    ))
+    ));
   }
 
   useEffect(() => {
